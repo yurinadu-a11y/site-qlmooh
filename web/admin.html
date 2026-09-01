@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Área administrativa QLM OOH para acompanhamento de campanhas.">
+  <title>QLM OOH · Administração</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <div class="app-shell admin-shell">
+    <aside class="sidebar" aria-label="Navegação administrativa">
+      <a class="brand" href="index.html" aria-label="QLM OOH início">
+        <span class="brand-mark">Q</span>
+        <span><strong>QLM</strong><small>OUT OF HOME</small></span>
+      </a>
+      <nav class="nav-links">
+        <a class="nav-link" href="index.html"><span>⌂</span> Visão geral</a>
+        <a class="nav-link active" href="admin.html"><span>▣</span> Todas as campanhas</a>
+        <a class="nav-link" href="index.html#simulador"><span>◈</span> Simulador</a>
+        <a class="nav-link" href="index.html#relatorios"><span>▤</span> Relatórios</a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="help-card"><span class="help-icon">?</span><strong>Precisa de ajuda?</strong><small>Fale com nosso time</small></div>
+        <div class="user-card"><span class="avatar">YN</span><span><strong>Yuri Nadu</strong><small>Administrador</small></span></div>
+      </div>
+    </aside>
+
+    <main class="content admin-content">
+      <header class="topbar"><div class="breadcrumb">Workspace <span>/</span> Administração</div><div class="top-actions"><a class="outline-button" href="index.html">Voltar ao painel</a></div></header>
+      <section class="page-heading admin-heading"><div><p class="eyebrow">CONTROLE OPERACIONAL</p><h1>Todas as campanhas</h1><p>Revise pedidos, pagamentos, vídeos e programação do painel.</p></div><button class="primary-button" id="export-button">Exportar visão</button></section>
+
+      <div class="demo-notice" role="status"><span>●</span><div><strong>Modo demonstração</strong><small>Os registros abaixo são exemplos visuais. A autenticação administrativa e a API de campanhas ainda precisam ser conectadas.</small></div></div>
+
+      <section class="metric-grid admin-metrics" aria-label="Resumo das campanhas">
+        <article class="metric-card"><div class="metric-label">Campanhas filtradas <span class="metric-icon violet">▣</span></div><strong id="total-count">06</strong><span class="trend neutral">visão atual</span></article>
+        <article class="metric-card"><div class="metric-label">Em revisão <span class="metric-icon orange">◌</span></div><strong id="review-count">02</strong><span class="trend neutral">aguardando análise</span></article>
+        <article class="metric-card"><div class="metric-label">Pagamentos confirmados <span class="metric-icon blue">R$</span></div><strong id="paid-count">03</strong><span class="trend neutral">prontas para operação</span></article>
+        <article class="metric-card"><div class="metric-label">Ativas no painel <span class="metric-icon green">◎</span></div><strong id="active-count">02</strong><span class="trend neutral">veiculando agora</span></article>
+      </section>
+
+      <section class="panel admin-table-panel" aria-labelledby="campaign-list-title">
+        <div class="panel-header"><div><h2 id="campaign-list-title">Fila de campanhas</h2><p id="result-label">06 registros encontrados</p></div><span class="sync-label">Última atualização: agora</span></div>
+        <div class="filters"><label class="search-field"><span>⌕</span><input id="search-input" type="search" placeholder="Buscar por campanha, cliente ou código" aria-label="Buscar campanhas"></label><label class="filter-field"><span>Status</span><select id="status-filter"><option value="all">Todos os status</option><option value="review">Em revisão</option><option value="paid">Pagamento confirmado</option><option value="scheduled">Agendada</option><option value="active">Ativa</option><option value="ended">Encerrada</option></select></label><label class="filter-field"><span>Período</span><select id="period-filter"><option value="all">Todos os períodos</option><option value="current">Em andamento</option><option value="future">Próximas</option><option value="past">Encerradas</option></select></label></div>
+        <div class="table-scroll"><table class="admin-table"><thead><tr><th>Campanha / cliente</th><th>Período</th><th>Status</th><th>Pagamento</th><th>Vídeo</th><th>Inserções</th><th>Valor</th><th>Ação</th></tr></thead><tbody id="campaign-rows"></tbody></table><div class="empty-state" id="empty-state" hidden>Nenhuma campanha corresponde aos filtros.</div></div>
+      </section>
+      <footer><span>© 2026 QLM OOH</span><span>Área administrativa <b>•</b> dados protegidos por autenticação no ambiente de produção</span></footer>
+    </main>
+  </div>
+  <script src="admin.js"></script>
+</body>
+</html>

@@ -1,12 +1,15 @@
 const DAILY_INSERTIONS = 4320;
-const MIN_DAYS = 1;
-const MAX_DAYS = 365;
+const MIN_DAYS = 7;
+const MAX_DAYS = 90;
+const PRICE_CURVE_MIN_DAYS = 1;
+const PRICE_CURVE_MAX_DAYS = 365;
 const PRICE_MAX = 99;
 const PRICE_MIN = 59;
 
 const money = value => value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 const dailyPrice = days => {
-  const ratio = (days - MIN_DAYS) / (MAX_DAYS - MIN_DAYS);
+  const ratio = (days - PRICE_CURVE_MIN_DAYS)
+    / (PRICE_CURVE_MAX_DAYS - PRICE_CURVE_MIN_DAYS);
   return Math.round((PRICE_MAX - (PRICE_MAX - PRICE_MIN) * ratio) * 100) / 100;
 };
 

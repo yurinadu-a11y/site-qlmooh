@@ -1,8 +1,10 @@
 package br.com.qlmooh;
 
 import java.text.NumberFormat;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
+import java.time.Clock;
 import java.util.Locale;
 
 /**
@@ -14,26 +16,31 @@ public class PricingUtils {
     public static final double PRICE_MIN = 59.00;
     public static final double PRICE_MAX = 99.00;
     public static final double PRICE_SEPTEMBER_SPECIAL = 1200.00;
+    public static final int MIN_CAMPAIGN_DAYS = 1;
+    public static final int MAX_CAMPAIGN_DAYS = 365;
+    public static final int INSERTIONS_PER_DAY = 4_320;
+    private static final int PROMOTION_MAX_DAYS = 30;
+    private static final int PROMOTION_YEAR = 2026;
+    private static final int PROMOTION_MONTH = 9;
 
     /**
      * Calcula o preço por dia com interpolação linear:
      * 1 dia → R$99, 365 dias → R$59.
      */
     public static double calculateDailyPrice(int days) {
-        if (days <= 0) {
-            throw new IllegalArgumentException("Número de dias deve ser maior que zero.");
-        }
-        if (days == 1) return PRICE_MAX;
-        double ratio = (double) (days - 1) / (365 - 1);
+        validateDuration(days);
+        if (days == MIN_CAMPAIGN_DAYS) return PRICE_MAX;
+        double ratio = (double) (days - MIN_CAMPAIGN_DAYS)
+                / (MAX_CAMPAIGN_DAYS - MIN_CAMPAIGN_DAYS);
         double price = PRICE_MAX - (PRICE_MAX - PRICE_MIN) * ratio;
-        return Math.round(price * 100.0) / 100.0;
+        return roundCurrency(price);
     }
 
     /** Calcula o valor total da campanha. */
     public static double calculateCampaignTotal(int days) {
         double daily = calculateDailyPrice(days);
         double total = daily * days;
-        return Math.round(total * 100.0) / 100.0;
+        return roundCurrency(total);
     }
 
     /**
@@ -41,11 +48,15 @@ public class PricingUtils {
      * para campanhas de 1 a 30 dias cujo início é em setembro de 2026.
      */
     public static Double getSeptemberSpecial(String startDate, int days) {
+        return getSeptemberSpecial(startDate, days, Clock.systemDefaultZone());
+    }
+
+    static Double getSeptemberSpecial(String startDate, int days, Clock clock) {
         LocalDate start = LocalDate.parse(startDate);
-        LocalDate now = LocalDate.now();
-        if (now.getMonthValue() == 9 && now.getYear() == 2026
-                && start.getMonthValue() == 9 && start.getYear() == 2026
-                && days >= 1 && days <= 30) {
+        LocalDate today = LocalDate.now(clock);
+        if (today.getMonthValue() == PROMOTION_MONTH && today.getYear() == PROMOTION_YEAR
+                && start.getMonthValue() == PROMOTION_MONTH && start.getYear() == PROMOTION_YEAR
+                && days >= MIN_CAMPAIGN_DAYS && days <= PROMOTION_MAX_DAYS) {
             return PRICE_SEPTEMBER_SPECIAL;
         }
         return null;
@@ -53,7 +64,7 @@ public class PricingUtils {
 
     /** Formata moeda brasileira: R$ 1.200,00 */
     public static String formatCurrency(double value) {
-        NumberFormat fmt = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
+        NumberFormat fmt = NumberFormat.getCurrencyInstance(Locale.of("pt", "BR"));
         String result = fmt.format(value);
         // Java usa non-breaking space (U+00A0) entre R$ e o valor;
         // normalizamos para espaço comum para compatibilidade com o backend.
@@ -65,17 +76,29 @@ public class PricingUtils {
      * 18h/dia × 3600s/h ÷ 15s = 4.320 inserções/dia.
      */
     public static CampaignDates calculateCampaignDates(String startDate, int days) {
+        validateDuration(days);
         LocalDate start = LocalDate.parse(startDate);
         LocalDate end = start.plusDays(days);
-        int insertionsPerDay = 18 * 3600 / 15; // 4320
-        int totalInsertions = insertionsPerDay * days;
+        int totalInsertions = INSERTIONS_PER_DAY * days;
         return new CampaignDates(
             start.toString(),
             end.toString(),
             days,
-            insertionsPerDay,
+            INSERTIONS_PER_DAY,
             totalInsertions
         );
+    }
+
+    private static void validateDuration(int days) {
+        if (days < MIN_CAMPAIGN_DAYS || days > MAX_CAMPAIGN_DAYS) {
+            throw new IllegalArgumentException(
+                    "A duração deve estar entre " + MIN_CAMPAIGN_DAYS + " e "
+                            + MAX_CAMPAIGN_DAYS + " dias.");
+        }
+    }
+
+    private static double roundCurrency(double value) {
+        return BigDecimal.valueOf(value).setScale(2, RoundingMode.HALF_UP).doubleValue();
     }
 
     /** DTO simples para datas e inserções. */

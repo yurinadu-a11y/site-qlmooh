@@ -26,7 +26,7 @@ e testes automatizados.
 # Compilar, testar e executar (via Maven)
 ./build.sh
 
-# Apenas testes
+# Apenas testes (falhas interrompem o build)
 ./build.sh test
 
 # Build via Maven diretamente
@@ -92,6 +92,9 @@ Tests run: 27, Failures: 0, Errors: 0, Skipped: 0
 - **PricingUtilsTest** (10): preços progressivos, formatação, inserções, validações
 - **CampaignTest** (6): construtor, getters/setters, toString, status progression
 - **CampaignStatusTest** (11): todos os 9 enums e descrições
+
+O modelo valida duração e inserções, e o cliente HTTP valida parâmetros,
+status HTTP e campos obrigatórios das respostas.
 
 ## Docker
 

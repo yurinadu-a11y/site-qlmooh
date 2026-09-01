@@ -5,27 +5,31 @@ set -e
 PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$PROJECT_DIR"
 
-# Tenta usar Maven primeiro (funciona com internet ou com artifacts pré-cacheados)
+# Tenta usar Maven primeiro (funciona com internet ou com artifacts pré-cacheados).
 if mvn -v >/dev/null 2>&1; then
     echo "🔧 Usando Maven..."
-    if [ "$1" == "test" ] || [ "$1" == "package" ]; then
-        mvn test -o 2>/dev/null || mvn test 2>/dev/null || true
-    fi
-    if [ "$1" != "test" ]; then
-        mvn compile -o 2>/dev/null
-        mvn package -o -DskipTests 2>/dev/null
+    case "${1:-run}" in
+        test)
+            mvn test -B
+            exit 0
+            ;;
+        package)
+            mvn package -B
+            exit 0
+            ;;
+    esac
+    if mvn package -B -DskipTests; then
         if [ -f "target/site-qlmooh-1.0.0.jar" ]; then
             echo "✅ Build via Maven concluído"
             java -jar target/site-qlmooh-1.0.0.jar
-        else
-            # Fallback to javac if Maven package fails
-            echo "Maven package não disponível, usando javac..."
-            CLASSPATH=$(find lib -name "*.jar" | tr '\n' ':')
-            rm -rf out out-test && mkdir -p out out-test
-            javac -d out -cp "$CLASSPATH" src/main/java/br/com/qlmooh/*.java
-            javac -d out-test -cp "$CLASSPATH:out" src/test/java/br/com/qlmooh/*Test.java
-            java -cp "out:$CLASSPATH" br.com.qlmooh.Main
         fi
+    else
+        echo "Maven falhou; usando javac..."
+        CLASSPATH=$(find lib -name "*.jar" -print | tr '\n' ':')
+        mkdir -p out out-test
+        javac -d out -cp "$CLASSPATH" src/main/java/br/com/qlmooh/*.java
+        javac -d out-test -cp "$CLASSPATH:out" src/test/java/br/com/qlmooh/*Test.java
+        java -cp "out:$CLASSPATH" br.com.qlmooh.Main
     fi
 else
     # Fallback: use javac directly

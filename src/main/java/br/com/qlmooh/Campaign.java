@@ -1,5 +1,7 @@
 package br.com.qlmooh;
 
+import java.util.Objects;
+
 /**
  * Representa uma campanha de outdoors digitais.
  * <p>
@@ -32,13 +34,14 @@ public class Campaign {
         this.code = code;
         this.userId = userId;
         this.name = name;
+        validateDuration(durationDays);
         this.durationDays = durationDays;
+        this.insertionsTotal = this.insertionsPerDay * durationDays;
         this.dailyPrice = dailyPrice;
         this.totalPrice = totalPrice;
         this.startDate = startDate;
         this.endDate = endDate;
         this.videoFilename = videoFilename;
-        this.insertionsTotal = this.insertionsPerDay * durationDays;
     }
 
     // ── Getters & Setters ──────────────────────────────────
@@ -53,7 +56,18 @@ public class Campaign {
     public void setName(String name) { this.name = name; }
 
     public int getDurationDays() { return durationDays; }
-    public void setDurationDays(int durationDays) { this.durationDays = durationDays; }
+    public void setDurationDays(int durationDays) {
+        validateDuration(durationDays);
+        this.durationDays = durationDays;
+        this.insertionsTotal = this.insertionsPerDay * durationDays;
+    }
+
+    private static void validateDuration(int durationDays) {
+        if (durationDays < PricingUtils.MIN_CAMPAIGN_DAYS
+                || durationDays > PricingUtils.MAX_CAMPAIGN_DAYS) {
+            throw new IllegalArgumentException("Duração de campanha inválida: " + durationDays);
+        }
+    }
 
     public double getDailyPrice() { return dailyPrice; }
     public void setDailyPrice(double dailyPrice) { this.dailyPrice = dailyPrice; }
@@ -74,10 +88,18 @@ public class Campaign {
     public void setInsertionsTotal(int insertionsTotal) { this.insertionsTotal = insertionsTotal; }
 
     public int getInsertionsPerDay() { return insertionsPerDay; }
-    public void setInsertionsPerDay(int insertionsPerDay) { this.insertionsPerDay = insertionsPerDay; }
+    public void setInsertionsPerDay(int insertionsPerDay) {
+        if (insertionsPerDay <= 0) {
+            throw new IllegalArgumentException("Inserções por dia devem ser maiores que zero.");
+        }
+        this.insertionsPerDay = insertionsPerDay;
+        this.insertionsTotal = this.insertionsPerDay * this.durationDays;
+    }
 
     public CampaignStatus getStatus() { return status; }
-    public void setStatus(CampaignStatus status) { this.status = status; }
+    public void setStatus(CampaignStatus status) {
+        this.status = Objects.requireNonNull(status, "Status é obrigatório.");
+    }
 
     public String getTermoVersion() { return termoVersion; }
     public void setTermoVersion(String termoVersion) { this.termoVersion = termoVersion; }

@@ -1,6 +1,9 @@
 package br.com.qlmooh;
 
 import org.junit.jupiter.api.Test;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -64,5 +67,18 @@ class PricingUtilsTest {
     @Test
     void testInvalidDaysThrows() {
         assertThrows(IllegalArgumentException.class, () -> PricingUtils.calculateDailyPrice(0));
+        assertThrows(IllegalArgumentException.class, () -> PricingUtils.calculateDailyPrice(366));
+        assertThrows(IllegalArgumentException.class,
+                () -> PricingUtils.calculateCampaignDates("2026-09-01", 0));
+    }
+
+    @Test
+    void testSeptemberSpecialUsesCampaignAndCurrentDate() {
+        Clock september = Clock.fixed(
+                Instant.parse("2026-09-10T12:00:00Z"), ZoneOffset.UTC);
+        assertEquals(1200.00,
+                PricingUtils.getSeptemberSpecial("2026-09-15", 30, september));
+        assertNull(PricingUtils.getSeptemberSpecial("2026-10-01", 30, september));
+        assertNull(PricingUtils.getSeptemberSpecial("2026-09-15", 31, september));
     }
 }

@@ -44,6 +44,16 @@ class CampaignTest {
     }
 
     @Test
+    void testCampaignInvariants() {
+        Campaign c = new Campaign();
+        assertThrows(IllegalArgumentException.class, () -> c.setDurationDays(366));
+        assertThrows(IllegalArgumentException.class, () -> c.setInsertionsPerDay(0));
+        assertThrows(NullPointerException.class, () -> c.setStatus(null));
+        c.setDurationDays(10);
+        assertEquals(43_200, c.getInsertionsTotal());
+    }
+
+    @Test
     void testGettersAndSetters() {
         Campaign c = new Campaign();
         c.setCode("ABC-123");

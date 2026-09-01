@@ -19,10 +19,15 @@
     </properties>
 
     <dependencies>
-        <!-- HTTP Client (Java 11+ nativo, mas incluímos para compat) -->
+        <!-- HTTP Client -->
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
             <artifactId>httpclient5</artifactId>
+            <version>5.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents.client5</groupId>
+            <artifactId>httpclient5-fluent</artifactId>
             <version>5.3.1</version>
         </dependency>
 
@@ -56,6 +61,15 @@
     </dependencies>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>3.4.1</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <!-- Compiler -->
             <plugin>

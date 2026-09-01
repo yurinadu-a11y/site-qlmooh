@@ -31,9 +31,16 @@ bin/
 target/
 *.class
 
-### Java ###
-*.jar
-!lib/README.md
+### Env ###
+.env
+
+### Build artifacts ###
+lib/*.jar
+lib/README.md
+.mvn-settings.xml
+dependency-reduced-pom.xml
+out/
+out-test/
 
 ### Mac OS ###
 .DS_Store
